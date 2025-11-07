@@ -15,10 +15,6 @@ jobs:
       - name: Set up mise
         uses: jdx/mise-action@v2
 
-      - name: Install Maven
-        run: mise install
-
       - name: Build with Maven
         run: |
-          ./mvnw package
-
+          ./mvnw package -B -ntp
