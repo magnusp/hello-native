@@ -20,4 +20,4 @@ jobs:
       - name: Build with Maven
         run: |
           javac -version
-          ./mvnw -Pnative package -B -ntp
+          mvn -Pnative package -B -ntp
