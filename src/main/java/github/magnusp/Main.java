@@ -9,7 +9,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 @SpringBootApplication
 public class Main {
 	static void main(String[] args) {
-		System.exit(SpringApplication.exit(new SpringApplicationBuilder(Runner.class)
+		System.exit(SpringApplication.exit(new SpringApplicationBuilder(Main.class)
 			.logStartupInfo(false)
 			.bannerMode(Banner.Mode.OFF)
 			.web(WebApplicationType.NONE)

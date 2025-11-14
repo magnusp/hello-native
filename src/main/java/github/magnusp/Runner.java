@@ -20,17 +20,12 @@ public class Runner implements CommandLineRunner, ExitCodeGenerator {
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		exitCode = new CommandLine(helloCommand, factory).execute(args);
 	}
 
 	@Override
 	public int getExitCode() {
 		return exitCode;
-	}
-
-	@Bean
-	PrintStream output() {
-		return new PrintStream(System.out);
 	}
 }
