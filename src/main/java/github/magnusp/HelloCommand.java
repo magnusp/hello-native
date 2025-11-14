@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "hi", description = "Says hello", mixinStandardHelpOptions = true)
+@Command(name="hello-native", description = "Says hello", mixinStandardHelpOptions = true)
 public class HelloCommand implements Callable<Integer> {
 
 	@Override
