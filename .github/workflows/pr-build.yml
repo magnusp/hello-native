@@ -12,6 +12,11 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      checks: write # JUnit reports
+      pull-requests: write # JUnit reports
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

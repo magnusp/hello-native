@@ -27,6 +27,8 @@ jobs:
 
     permissions:
       contents: write
+      checks: write # JUnit reports
+      pull-requests: write # JUnit reports
 
     steps:
       - name: Checkout code
