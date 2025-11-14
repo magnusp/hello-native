@@ -52,6 +52,18 @@ jobs:
         run: |
           ./mvnw ${{ env.MAVEN_ARGS }} -Pnative clean native:compile
 
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v6
+        if: success() || failure()
+
+        with:
+          check_name: |
+            JUnit Test Report
+          report_paths: |
+            **/target/surefire-reports/TEST-*.xml
+          include_passed: true
+          include_time_in_summary: true
+
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
