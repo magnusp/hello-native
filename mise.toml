@@ -1,3 +1,2 @@
 [tools]
-java = "graalvm-community-25"
-maven = "latest"
+java = "corretto-25"

@@ -1,0 +1,26 @@
+name: PR Build
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+
+env:
+  MAVEN_ARGS: "--batch-mode --no-transfer-progress"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+
+      - name: Activate mise
+        run: |
+          mise env --dotenv >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          ./mvnw ${{ env.MAVEN_ARGS }} clean verify

@@ -1,0 +1,97 @@
+name: Create Release with Native Executable
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+      release_name:
+        description: 'Release name'
+        required: false
+        type: string
+        default: ''
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  MAVEN_ARGS: "--batch-mode --no-transfer-progress"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        env:
+          MISE_ENV: native
+
+      - name: Activate mise
+        run: |
+          mise env -E native --dotenv >> $GITHUB_ENV
+
+      - name: Update version in pom.xml
+        run: |
+          VERSION="${{ inputs.version }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          ./mvnw ${{ env.MAVEN_ARGS }} versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
+
+      - name: Build native executable
+        run: |
+          ./mvnw ${{ env.MAVEN_ARGS }} -Pnative clean native:compile
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          # Find the native executable
+          EXECUTABLE_PATH=$(find target -name "hello-native" -type f -executable | head -1)
+          if [ -z "$EXECUTABLE_PATH" ]; then
+            echo "Native executable not found!"
+            exit 1
+          fi
+          
+          # Copy and rename the executable
+          cp "$EXECUTABLE_PATH" release-assets/
+          chmod +x release-assets/hello-native
+
+      - name: Set release name
+        id: release_name
+        run: |
+          if [ -n "${{ inputs.release_name }}" ]; then
+            echo "name=${{ inputs.release_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=Release ${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ inputs.version }}
+          release_name: ${{ steps.release_name.outputs.name }}
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
+
+      - name: Upload Linux executable
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-assets/hello-native
+          asset_name: hello-native-linux-amd64
+          asset_content_type: application/octet-stream
