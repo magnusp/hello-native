@@ -3,6 +3,9 @@ name: PR Build
 on:
   pull_request:
     types: [ opened, synchronize ]
+  push:
+    branches:
+      - main
 
 env:
   MAVEN_ARGS: "--batch-mode --no-transfer-progress"
